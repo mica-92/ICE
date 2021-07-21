@@ -27,6 +27,7 @@ col_names = ['Date',
 
 n = "PIL19t"
 exp_data = pd.read_csv (f'D:\ICE\Qi-2017\MICA\{n}.csv',names=col_names)
+
 #exp_data = exp_data[130:526]
 
 # Data

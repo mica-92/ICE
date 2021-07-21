@@ -75,7 +75,15 @@ for row in temp_cold:
 
 
 ##### Strain Rates
+col_namesi = ['rate']
+exp_data = pd.read_csv ('D:/ICE/DM/rates.csv', names = col_namesi)
+rates = exp_data['rate']
 
+for row in temp_warm:
+    t=[]
+    SR = ((1)/(6e+28 * np.exp(-181/(0.0083145*temp_warm))))**(0.25)
+    t.append(SR)
+    #print(t)
 
 
 
@@ -89,6 +97,7 @@ fig, ax = plt.subplots(constrained_layout=True)
 
 #Boundary DC-GBS 
 ax.plot(temp, bound, color='#F4AC32', linestyle='dashed', linewidth=3)
+ax.plot(temp_warm, t)
 #Boundary GBS-BS
 #ax.plot(temp_cold, boundary_GBSBS257, label='Boudnary II')
 
