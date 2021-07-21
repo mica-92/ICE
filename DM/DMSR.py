@@ -1,5 +1,7 @@
 import csv
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as pe
+
 import pandas as pd
 import math
 import numpy as np
@@ -47,8 +49,6 @@ temp_cold = pd.Series(np.arange(150,258,1))
 for row in temp_warm:
     DCGBS = []
     GBSBS = []
-    TW = []
-    TC = []
 
     # Individual Mechanims
     boundary_DC = A_DC259 * np.exp ((-Q_DC259)/ (R * temp_warm)) / (d ** p_DC)
@@ -73,6 +73,13 @@ for row in temp_cold:
     DCGBS.append(boundary_DCGBS257)
     GBSBS.append(boundary_GBSBS257)
 
+
+##### Strain Rates
+
+
+
+
+
 # Series Append - unsure what is not working of DCGBS
 temp = temp_cold.append(temp_warm)
 bound = boundary_DCGBS257.append(boundary_DCGBS259)
@@ -80,15 +87,20 @@ bound = boundary_DCGBS257.append(boundary_DCGBS259)
 # Deformation Map Plot
 fig, ax = plt.subplots(constrained_layout=True)
 
-#Boundary DC-GBS
-ax.plot(temp, bound, label='Boundary')
+#Boundary DC-GBS 
+ax.plot(temp, bound, color='#F4AC32', linestyle='dashed', linewidth=3)
 #Boundary GBS-BS
-ax.plot(temp_cold, boundary_GBSBS257, label='Boudnary II')
+#ax.plot(temp_cold, boundary_GBSBS257, label='Boudnary II')
 
 plt.yscale("log")
 ax.set_xlabel('Temperature (K)', labelpad=10)
 ax.set_ylabel('Stress (MPa)', labelpad=10)
 ax.set_title(f'Deformation Mechanism Map\n Grain size {d} meters')
+ax.fill_between(temp, 10e-6, bound, facecolor='#FACC6B', alpha=0.3, label='Grain Boundary Sliding')
+ax.fill_between(temp, bound, 1000, facecolor='#FFD131', alpha=0.3, label='Dislocation Creep' )
+ax.text(220, 30, 'Dislocation\nCreep', fontweight='bold', color = '#271902', path_effects=[pe.withStroke(linewidth=5, foreground='w')])
+ax.text(180, 0.001, 'Grain Boundary\nSliding', fontweight='bold', color = '#271902', path_effects=[pe.withStroke(linewidth=5, foreground='w')])
+
 
 # Secondary XAxis
 def THT(x):
@@ -106,5 +118,5 @@ def EES(y):
 secay = ax.secondary_yaxis('right', functions=(SEE, EES))
 secay.set_ylabel('Stress / E', labelpad=10)
 
-#ax.legend() 
+ax.legend
 plt.show()

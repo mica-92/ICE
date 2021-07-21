@@ -24,3 +24,13 @@ def rad2deg(x):
 secax = ax.secondary_xaxis('top', functions=(HT, rad2deg))
 secax.set_xlabel('angle [rad]')
 plt.show()
+
+
+plot_DCGBS259 = plt.plot(temp_warm/273, boundary_DCGBS259, color = 'darkblue')
+plot_DCGBS257 = plt.plot(temp_cold/273, boundary_DCGBS257, color = 'red')
+#plt.plot(temp_warm/273, boundary_GBSBS259, color = 'darkblue')
+plot_GBSBS257 = plt.plot(temp_cold/273, boundary_GBSBS257, color = 'red')
+plt.yscale("log")
+plt.title(f'Deformation Mechanism Map\n Grain size {d} meters')
+plt.xlabel('Temperature')
+plt.show()
