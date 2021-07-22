@@ -79,25 +79,21 @@ col_namesi = ['rate']
 exp_data = pd.read_csv ('D:/ICE/DM/rates.csv', names = col_namesi)
 rates = exp_data['rate']
 
-for row in temp_warm:
-    t=[]
-    SR = ((1)/(6e+28 * np.exp(-181/(0.0083145*temp_warm))))**(0.25)
-    t.append(SR)
-    #print(t)
-
-
-
-
 # Series Append - unsure what is not working of DCGBS
 temp = temp_cold.append(temp_warm)
 bound = boundary_DCGBS257.append(boundary_DCGBS259)
+
+
+for row in temp:
+    SR = (1/(6e+28 * np.exp(-181/(0.0083145*temp))))**(0.25)
+    SER = np.array(SR)
 
 # Deformation Map Plot
 fig, ax = plt.subplots(constrained_layout=True)
 
 #Boundary DC-GBS 
 ax.plot(temp, bound, color='#F4AC32', linestyle='dashed', linewidth=3)
-ax.plot(temp_warm, t)
+ax.plot(temp, SER)
 #Boundary GBS-BS
 #ax.plot(temp_cold, boundary_GBSBS257, label='Boudnary II')
 
@@ -106,7 +102,7 @@ ax.set_xlabel('Temperature (K)', labelpad=10)
 ax.set_ylabel('Stress (MPa)', labelpad=10)
 ax.set_title(f'Deformation Mechanism Map\n Grain size {d} meters')
 ax.fill_between(temp, 10e-6, bound, facecolor='#FACC6B', alpha=0.3, label='Grain Boundary Sliding')
-ax.fill_between(temp, bound, 1000, facecolor='#FFD131', alpha=0.3, label='Dislocation Creep' )
+ax.fill_between(temp, bound, 10000000000, facecolor='#FFD131', alpha=0.3, label='Dislocation Creep' )
 ax.text(220, 30, 'Dislocation\nCreep', fontweight='bold', color = '#271902', path_effects=[pe.withStroke(linewidth=5, foreground='w')])
 ax.text(180, 0.001, 'Grain Boundary\nSliding', fontweight='bold', color = '#271902', path_effects=[pe.withStroke(linewidth=5, foreground='w')])
 
