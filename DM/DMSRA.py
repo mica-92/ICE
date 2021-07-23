@@ -1,7 +1,6 @@
 import csv
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as pe
-
 import pandas as pd
 import math
 import numpy as np
@@ -74,32 +73,38 @@ for row in temp_cold:
     GBSBS.append(boundary_GBSBS257)
 
 
-##### Strain Rates
-col_namesi = ['rate']
-exp_data = pd.read_csv ('D:/ICE/DM/rates.csv', names = col_namesi)
-rates = exp_data['rate']
+##### Strain Rates DC
+rate_name = ['rate']
+exp_rate = pd.read_csv ('D:/ICE/DM/rates.csv', names = rate_name)
+rates = exp_rate['rate']
+
+SRdata_final={}
+for i in rates:
+    SRdata=[]
+    for j in temp_warm:
+        SR = (i/(A_DC259 * np.exp(-Q_DC259/(R*j))))**(n_DC ** -1)
+        SR = np.array(SR)
+        SRdata.append(SR)
+    SRdata_final[i]=SRdata.copy()
+strain_rates_final = pd.DataFrame(SRdata_final)
+#print(df)
+
 
 # Series Append - unsure what is not working of DCGBS
 temp = temp_cold.append(temp_warm)
 bound = boundary_DCGBS257.append(boundary_DCGBS259)
 
-
-for row in temp:
-    SR = (1/(6e+28 * np.exp(-181/(0.0083145*temp))))**(0.25)
-    SER = np.array(SR)
-
 # Deformation Map Plot
 fig, ax = plt.subplots(constrained_layout=True)
 
-#Boundary DC-GBS 
+#Plotting 
 ax.plot(temp, bound, color='#F4AC32', linestyle='dashed', linewidth=3)
-
-#Boundary GBS-BS
 #ax.plot(temp_cold, boundary_GBSBS257, label='Boudnary II')
+for k in range(len(strain_rates_final.columns)): #loop for strain rates
+    ax.plot(temp_warm, strain_rates_final.iloc[:,k], label="{:.2e}".format(rates[k]))
 
 plt.yscale("log")
-ax.set_xlabel('Temperature (K)', labelpad=10)
-ax.set_ylabel('Stress (MPa)', labelpad=10)
+
 ax.set_title(f'Deformation Mechanism Map\n Grain size {d} meters')
 ax.fill_between(temp, 10e-6, bound, facecolor='#FACC6B', alpha=0.3, label='Grain Boundary Sliding')
 ax.fill_between(temp, bound, 10000000000, facecolor='#FFD131', alpha=0.3, label='Dislocation Creep' )
@@ -107,6 +112,9 @@ ax.text(220, 30, 'Dislocation\nCreep', fontweight='bold', color = '#271902', pat
 ax.text(180, 0.001, 'Grain Boundary\nSliding', fontweight='bold', color = '#271902', path_effects=[pe.withStroke(linewidth=5, foreground='w')])
 
 
+## Plot Axis
+ax.set_xlabel('Temperature (K)', labelpad=10)
+ax.set_ylabel('Stress (MPa)', labelpad=10)
 # Secondary XAxis
 def THT(x):
     return x / 273
@@ -114,8 +122,7 @@ def tht(x):
     return 273 * x
 secax = ax.secondary_xaxis('top', functions=(THT, tht))
 secax.set_xlabel('T/Tm', labelpad=10)
-
-# Secondary XAxis
+# Secondary YAxis
 def SEE(y):
     return y / EE
 def EES(y):

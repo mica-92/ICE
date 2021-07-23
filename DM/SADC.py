@@ -1,4 +1,4 @@
-## Code for Strain Rates only with graph warm temperature
+## Code for Strain Rates only with graph all temperatures
 
 import csv
 import matplotlib.pyplot as plt
