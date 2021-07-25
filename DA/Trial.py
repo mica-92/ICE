@@ -23,7 +23,7 @@ col_names = ['Date',
              'Strain',
              'TimeSec']
 
-exp_data = pd.read_csv ('D:\ICE\Qi-2017\MICA\PIL19t.csv',names=col_names, skiprows=50, skipfooter=0)
+exp_data = pd.read_csv ('D:\ICE\DATA\PIL19.csv',names=col_names, skiprows=50, skipfooter=0)
 
 # Machine Parameters
 vtoinch = 0.17153
