@@ -1,4 +1,11 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[17]:
+
+
 import csv
+from typing import final
 import matplotlib.pyplot as plt
 import pandas as pd
 import math
@@ -6,8 +13,6 @@ import numpy as np
 from scipy.stats import linregress
 import datetime
 import time
-
-
 
 col_names = ['Date',
              'Time',
@@ -25,9 +30,8 @@ col_names = ['Date',
              'Strain',
              'TimeSec']
 
-n = 'PIL19t'
+n = 'PIL19'
 exp_data = pd.read_csv (f'D:\ICE\DATA\{n}.csv',names=col_names, skiprows=2)
-#exp_data = exp_data[130:526]
 
 # Data
 temp = exp_data['Temperature']
@@ -38,16 +42,16 @@ disp = exp_data['Displacement']
 raw_time = exp_data['Time']
 sec_list = []
 time = []
+
 for row in raw_time:
     time = row[:-3]
-    #print(timeii)
     ftr = [3600,60,1]
-    sec = sum([a*b for a,b in zip(ftr, map(int,time.split(':')))])#see how I can substract the first out of each
+    if row[-2:] == 'PM' and row[0:2] != '12':
+        sec = 43200 + sum([a*b for a,b in zip(ftr, map(int,time.split(':')))])
+    else:
+        sec = sum([a*b for a,b in zip(ftr, map(int,time.split(':')))])
     sec_list.append(sec)
-    sec0 = sec_list[0] 
-    sec = sec - sec0 #not startin
-    #print(sec_list)
-    #print(sec0)
+
 
 # Machine Parameters
 vtoinch = 0.17153
@@ -57,65 +61,92 @@ vtoIL_fine = 202
 # Experiment Parameters
 L0 = 2.2 #inches
 strain_rate = 5e-05 #constant
-disp0 = disp[0]
-Lf = L0 - (disp - disp0) * vtoinch
+Lf = L0 - disp * vtoinch
 sample_r = 0.55 #inches includes sample plus iridium jacket
 Q_DC = 181 #KJ/mol
 R = 0.0083145 #KJ/mol
 T_norm = 263.55 #how was this calculated
 
 
-def nonzeroDigits(f,n=2):
-    counter = 1
-    s = str(f).replace(".","")
-    for ndx,i in enumerate(s):
-        if i == "0":
-            counter = 1
-            continue
-        if counter >= n:
-            return s[ndx - n + 1: ndx + 1]
-        counter += 1
-    raise ValueError("Doesn't have non-zero consecutive Digits")
 
-print(nonzeroDigits(strain_rate))
-
-
+Lf = L0 - disp * vtoinch
 stress = IL * vtoIL_fine * Lf / (sample_r**2 * math.pi * L0)
 strain = np.log(L0 / Lf)
 strain_norm = strain * np.exp((- Q_DC / R) * ((T_norm ** -1)-(temp**-1)))
-
-# Plots
+    
 plot_TS = plt.plot(raw_time, strain_norm, color = 'darkblue')
 plt.title(f'{n}\nStrain- Time Plot')
 plt.xlabel('Time (seconds)')
 plt.ylabel('Strain')
 plt.show()
+    
 
-plot_SS = plt.plot(strain_norm, stress, color = 'darkblue', alpha = 0.3)
-plt.title(f'{n}\nStrain- Stress Plot')
-plt.xlabel('Strain')
-plt.ylabel('Stress (MPa)')
-#plt.show()
 
-plot_ST = plt.plot(strain_norm, temp)
-plt.title(f'{n}\nStrain- Temperature Plot')
-plt.xlabel('Strain')
-plt.ylabel('Temp')
-#plt.show()
+# In[33]:
 
-slope, intercept, r_value, p_value, std_err = linregress (sec_list, strain)
-#print(slope)
 
-# Peak
-index_min = np.argmax(stress)
-#print(index_min)
-max_stress = np.amax(stress)
-#print(max_stress)
-maxstress = stress[26]
-#print(maxstress)
-max_temp = temp[26] #temp peak
 
-# Flow
-flow_stress = np.mean(stress[-5:-1])
-flow_temp = np.mean(temp[-5:-1])
-flow_strain = np.mean(strain[-5:-1])
+def experiment(s):
+    a = s
+    values = []
+    
+    for i in range(0,(len(a)-1)):
+        j = i+5
+        if j <= (len(a)-1):
+            slope, intercept, r_value, p_value, std_err = linregress (sec_list[i:j],strain_norm[i:j])
+        else:
+            j = (len(a)-1)
+            slope, intercept, r_value, p_value, std_err = linregress (sec_list[i:j],strain_norm[i:j])
+        values.append(slope)
+    
+    #First Cut
+    condition = False
+    h = 0
+    while condition == False:
+        if 4e-05 < values[h] < 6e-05:
+            condition = True
+        else:
+            h=h+1
+    
+    #Second Cut
+    condition_2 = False
+    q = h
+    while condition_2 == False:
+        if values[q] < 0:
+            condition_2 = True
+        else:
+            q=q+1
+    return h, q
+
+
+# In[34]:
+
+
+cut = experiment(sec_list)
+print(cut)
+
+
+# In[36]:
+
+
+y_final = strain_norm[cut[0]:cut[1]+4]
+time_final = raw_time[cut[0]:cut[1]+4]
+
+plot_TS = plt.plot(time_final, y_final, color = 'darkblue')
+plt.title(f'{n}\nStrain- Time Plot')
+plt.xlabel('Time (seconds)')
+plt.ylabel('Strain')
+plt.show()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+

@@ -1,16 +1,5 @@
 
-col_names = ['Date',
-             'Time',
-             'Pressure',
-             'Temperature',
-             'Internal Load',
-             'External Load',
-             'Displacement',
-             'Intensifier',
-             '6v',
-             'Bath Temperature',
-             'Piston13',
-             'Piston20']
+
 
 n = 'PIL19'
 exp_data = pd.read_csv (f'D:\ICE\DATA\{n}t.csv',names=col_names)

@@ -81,6 +81,12 @@ rate_name = ['rate']
 exp_rate = pd.read_csv ('D:/ICE/DM/rates.csv', names = rate_name)
 rates = exp_rate['rate']
 
+
+# ---------------------
+## complete = {}
+##### for i in d:
+
+
 SRdata_final={} # strain rate curves = SR DC + SR GBS  shouldn'e we add a strain rate for BS?
 for i in rates:
     SRdata=[]
@@ -94,6 +100,7 @@ for i in rates:
         SRdata.append(SR)
     SRdata_final[i]=SRdata.copy()
 SR_final = pd.DataFrame(SRdata_final)
+#complete[d] = SR_final
 
 
 # Series Append - unsure what is not working of DCGBS
