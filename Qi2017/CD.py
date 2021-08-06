@@ -30,7 +30,7 @@ col_names = ['Date',
              'Strain',
              'TimeSec']
 
-n = 'PIL19'
+n = 'PIL20'
 exp_data = pd.read_csv (f'D:\ICE\DATA\{n}.csv',names=col_names, skiprows=2)
 
 # Data

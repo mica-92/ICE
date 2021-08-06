@@ -14,7 +14,7 @@ vtoIL_coarse = 1280 #high stresses or very cold conditions
 vtoIL_fine = 202
 
 # Reading Experiment Information from Experiment Master Sheet (EMS)
-col_EMS = ['Experiment Number', 'Grain size', 'Original Lenght', 'Strain Strain']
+col_EMS = ['Experiment Number', 'Grain size', 'Original Lenght', 'Strain Strain', 'Sample Touch']
 exp_EMS = pd.read_csv (f'D:\ICE\DATA\EMS.csv', names = col_EMS, skiprows=1)
 experiment_number = exp_EMS['Experiment Number']
 
@@ -40,7 +40,7 @@ for i in experiment_number:
             sec = sum([a*b for a,b in zip(ftr, map(int,time.split(':')))])
         sec_list.append(sec)
         pd.Series(sec_list)        
-        print(sec_list)
+        #print(sec_list)
     
     # Experiment Parameters
     L0 = 2.2 #inches
@@ -58,7 +58,7 @@ strain_norm = strain * np.exp((- Q_DC / R) * ((T_norm ** -1)-(temp**-1)))
 
 # Plots
 plot_TS = plt.plot(sec_list, strain_norm, color = 'darkblue')
-plt.title(f'{n}\nStrain- Time Plot')
+plt.title('Strain- Time Plot')
 plt.xlabel('Time (seconds)')
 plt.ylabel('Strain')
 plt.show()
