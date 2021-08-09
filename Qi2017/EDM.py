@@ -1,7 +1,10 @@
-## This is working but not the way of cutting data
-## Revisar
+#Update Log
+    # August 6th = Cutting Data works for all sets except 33
+    # August 9th = Change to strain vs. strain_norm (this was a mistake from my part). Show all data instead of only 
 
+# Import
 import csv
+from os import read
 from typing import final
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -11,6 +14,7 @@ from pandas.core.frame import DataFrame
 from scipy.stats import linregress
 import datetime
 import time
+import seaborn as sns
 
 # Machine Parameters
 vtoinch = 0.17153
@@ -33,7 +37,7 @@ final_data = {}
 for i in experiment_number:
 # Loading the CSV file for each experiment
     exp_data = pd.read_csv (f'D:\ICE\DATA\PIL{i}.csv', names = col_EXP, skiprows = 2)
-    # Loading the data of the Experiment Master Sheet (EMS) fore each experiment
+    # Loading the data of the Experiment Master Sheet (EMS) for each experiment
     loc = experiment_number[experiment_number == i].index[0] #determination of the row for each experiment
     L0 = exp_EMS['Original Lenght'][loc] # Original Sample Lenght
     SR_exp = exp_EMS['Strain Rate'][loc] # Target Strain Rate
@@ -76,9 +80,7 @@ for i in experiment_number:
     Lf_raw = L0 - disp * vtoinch
     stress_raw = IL * vtoIL_fine * Lf_raw / (sample_r**2 * math.pi * L0)
     strain_raw = np.log(L0 / Lf_raw)
-    strain_norm_raw = strain_raw * np.exp((- Q_DC / R) * ((T_norm ** -1)-(temp**-1)))
     sec_list = sec_list[time_loc:]
-
 
 # Slope Range determined by 
     def strain_rate_range(u,n=1):
@@ -126,10 +128,10 @@ for i in experiment_number:
         for i in range(0,(len(a)-1)):
             j = i+5
             if j <= (len(a)-1):
-                slope, intercept, r_value, p_value, std_err = linregress (sec_list[i:j],strain_norm_raw[i:j])
+                slope, intercept, r_value, p_value, std_err = linregress (sec_list[i:j],strain_raw[i:j])
             else:
                 j = (len(a)-1)
-                slope, intercept, r_value, p_value, std_err = linregress (sec_list[i:j],strain_norm_raw[i:j])
+                slope, intercept, r_value, p_value, std_err = linregress (sec_list[i:j],strain_raw[i:j])
             values.append(slope)
         
         #First Cut
@@ -142,48 +144,64 @@ for i in experiment_number:
                 h=h+1
         
         #Second Cut - Not sure if necessary
-            #        condition_2 = False
-            #        q = h
-            #        while condition_2 == False:
-            #            if values[q] < -4.5e-04:
-            #                condition_2 = True
-            #            else:
-            #                q=q+1
-        return h
-    initial_cut = slope_calc(sec_list)
+            condition_2 = False
+            q = h
+            while condition_2 == False:
+                if values[q] < 0:
+                    condition_2 = True
+                else:
+                    q=q+1
+        return h,q
+    cut = slope_calc(sec_list)
+    initial_cut = cut[0]
+    final_cut = cut[1]
     #print(f'This is the loc cut for {i}', initial_cut)    
-    
-# Recalculation Strain and Stess with new displacent[0] for trimmed data
+ 
+# Re- Calculation Strain and Stess with new displacent[0] for trimmed data
     # Por algun extraño motivo cuando tengo que hacer ranges necesito el numero de range pero si llamo un elemento necesito la posicion en relacion a la row original (?)
     disp_loc = time_loc + initial_cut
     Lf_final = L0 - (disp[initial_cut:]-disp[disp_loc]) * vtoinch
     stress = IL[initial_cut:] * vtoIL_fine * Lf_final / (sample_r**2 * math.pi * L0)
-    strain_norm = np.log(L0 / Lf_final) * np.exp((- Q_DC / R) * ((T_norm ** -1)-(temp[initial_cut:]**-1)))
+    strain = np.log(L0 / Lf_final)
 
-    #  Datos funcionando para todos menos para 33
+# Cutting data at 0.1 strain
+    strain_loc = [n for n,i in enumerate(strain) if i > 0.1][0]
+    stress_final = stress[:final_cut]
+    strain_final = strain[:final_cut]
 
+    #print(sec_list)
+    #print(stress_final)
 
-    # Raw Data Plots
-    fig, axs = plt.subplots(4)
-    fig.suptitle(f'Raw Data Plots: PIL{i}')
-    axs[0].plot(strain_norm, stress, color = 'darkblue')
-    axs[0].set_title('Stress- Strain')
-    axs[1].plot(sec_list[initial_cut:], strain_norm, color = 'red')
-    axs[1].set_title('Strain- Time')
-
-    axs[2].plot(strain_norm_raw, stress_raw, color = 'darkblue')
-    axs[2].set_title('Raw Stress- Strain')
-    axs[3].plot(sec_list, strain_norm_raw, color = 'red')
-    axs[3].set_title('Raw Strain- Time')
+    # Experiment Plots
+    fig, axs = plt.subplots(2,2)
+    fig.suptitle(f'PIL{i}')
+    axs[0,1].plot(strain_final, stress_final, color = 'darkblue')
+    axs[0,1].set_title('Processed Stress- Strain')
+    #axs[1,1].plot(sec_list[initial_cut:final_cut], strain_final, color = 'red')#[:strain_loc]
+    #axs[1,1].set_title('Processed Strain- Time')
+    axs[0,0].plot(strain_raw, stress_raw, color = 'darkblue')
+    axs[0,0].set_title('Raw Stress- Strain')
+    axs[1,0].plot(sec_list, strain_raw, color = 'red')
+    axs[1,0].set_title('Raw Strain- Time')
 
     plt.show()
 
 
+# Saving Data in Dictionary
+    final_data[i] = {'Temperature':temp[:strain_loc], 'Internal Load':IL[:strain_loc], 'Displacement':disp[initial_cut:strain_loc], 'Seconds': sec_list[:strain_loc], 'L0': L0, 'Strain Rate Exp': SR_exp, 'Grain Size': d, 'Stress': stress_final, 'Strain Norm': strain_final} #Diccionario   
 
-
-    #strain_loc = [n for n,i in enumerate(strain_norm) if i > 0.2][0]
-    final_data[i] = {'Stress': stress, 'Strain': Lf_raw, 'IL': IL, 'LF': Lf_raw, 'DISLOC': initial_cut} #Diccionario    
-
+fig, axs = plt.subplots(2)
+axs[0].plot(final_data[19]['Strain Norm'], final_data[19]['Stress'], color = 'darkblue')
+axs[0].plot(final_data[20]['Strain Norm'], final_data[20]['Stress'], color = 'darkblue')
+axs[0].plot(final_data[21]['Strain Norm'], final_data[21]['Stress'], color = 'darkblue')
+axs[1].plot(final_data[32]['Strain Norm'], final_data[32]['Stress'], color = 'darkblue')
+axs[1].plot(final_data[35]['Strain Norm'], final_data[35]['Stress'], color = 'darkblue')
+axs[1].plot(final_data[36]['Strain Norm'], final_data[36]['Stress'], color = 'darkblue')
+plt.title('Strain- Stress Plot')
+plt.xlabel('Strain')
+plt.ylabel('Stress')
+#plt.show()
+    
 
 
 
