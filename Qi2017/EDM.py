@@ -1,6 +1,7 @@
-#Update Log
+# Update Log
     # August 6th = Cutting Data works for all sets except 33
-    # August 9th = Change to strain vs. strain_norm (this was a mistake from my part). Show all data instead of only 
+    # August 9th = Change to strain vs. strain_norm (this was a mistake from my part). Show all data instead of only. Removed 32 as well.
+    # August 10th = Fixed color, dcitionary iteration and plotting 
 
 # Import
 import csv
@@ -15,6 +16,7 @@ from scipy.stats import linregress
 import datetime
 import time
 import seaborn as sns
+import random
 
 # Machine Parameters
 vtoinch = 0.17153
@@ -43,6 +45,12 @@ for i in experiment_number:
     SR_exp = exp_EMS['Strain Rate'][loc] # Target Strain Rate
     GS_exp = exp_EMS['Grain size'][loc] # Grain Size (Coarse, Standard or Fine )
     time_sample =  exp_EMS['Sample Touch'][loc] # Log of the touch sample moment
+
+# Setting the experiment color
+    r = random.random()
+    b = random.random()
+    g = random.random()
+    color = (r, g, b)
 
 # Experiment Time Treatment
     ## Time to seconds  convention
@@ -144,64 +152,73 @@ for i in experiment_number:
                 h=h+1
         
         #Second Cut - Not sure if necessary
-            condition_2 = False
-            q = h
-            while condition_2 == False:
-                if values[q] < 0:
-                    condition_2 = True
-                else:
-                    q=q+1
+        condition_2 = False
+        q = h
+        while condition_2 == False:
+            if values[q] < 0:
+                condition_2 = True
+            else:
+                q=q+1
         return h,q
     cut = slope_calc(sec_list)
-    initial_cut = cut[0]
-    final_cut = cut[1]
+    cut_initial = cut[0]
+    cut_final = cut[1]-5
     #print(f'This is the loc cut for {i}', initial_cut)    
- 
+    
 # Re- Calculation Strain and Stess with new displacent[0] for trimmed data
     # Por algun extraño motivo cuando tengo que hacer ranges necesito el numero de range pero si llamo un elemento necesito la posicion en relacion a la row original (?)
-    disp_loc = time_loc + initial_cut
-    Lf_final = L0 - (disp[initial_cut:]-disp[disp_loc]) * vtoinch
-    stress = IL[initial_cut:] * vtoIL_fine * Lf_final / (sample_r**2 * math.pi * L0)
+    disp_loc = time_loc + cut_initial
+    Lf_final = L0 - (disp[cut_initial:cut_final]-disp[disp_loc]) * vtoinch
+    stress = IL[cut_initial:cut_final] * vtoIL_fine * Lf_final / (sample_r**2 * math.pi * L0)
     strain = np.log(L0 / Lf_final)
+    stress_final = stress - stress[disp_loc]
+    strain_final = strain
+    #strain_loc = [n for n,i in enumerate(strain) if i > 0.1][0]
 
-# Cutting data at 0.1 strain
-    strain_loc = [n for n,i in enumerate(strain) if i > 0.1][0]
-    stress_final = stress[:final_cut]
-    strain_final = strain[:final_cut]
-
-    #print(sec_list)
-    #print(stress_final)
 
     # Experiment Plots
     fig, axs = plt.subplots(2,2)
     fig.suptitle(f'PIL{i}')
     axs[0,1].plot(strain_final, stress_final, color = 'darkblue')
     axs[0,1].set_title('Processed Stress- Strain')
-    #axs[1,1].plot(sec_list[initial_cut:final_cut], strain_final, color = 'red')#[:strain_loc]
-    #axs[1,1].set_title('Processed Strain- Time')
+    axs[1,1].plot(sec_list[cut_initial:cut_final], strain_final, color = 'red')
+    axs[1,1].set_title('Processed Strain- Time')
     axs[0,0].plot(strain_raw, stress_raw, color = 'darkblue')
     axs[0,0].set_title('Raw Stress- Strain')
     axs[1,0].plot(sec_list, strain_raw, color = 'red')
     axs[1,0].set_title('Raw Strain- Time')
 
-    plt.show()
+    #plt.show()
 
 
 # Saving Data in Dictionary
-    final_data[i] = {'Temperature':temp[:strain_loc], 'Internal Load':IL[:strain_loc], 'Displacement':disp[initial_cut:strain_loc], 'Seconds': sec_list[:strain_loc], 'L0': L0, 'Strain Rate Exp': SR_exp, 'Grain Size': d, 'Stress': stress_final, 'Strain Norm': strain_final} #Diccionario   
+    final_data[i] = {'Temperature':temp[cut_initial:cut_final], 
+                        'Internal Load':IL[cut_initial:cut_final], 
+                        'Displacement':disp[cut_initial:cut_final], 
+                        'Seconds': sec_list[cut_initial:cut_final], 
+                        'L0': L0, 'Strain Rate Exp': SR_exp, 
+                        'Grain Size': GS_exp, 
+                        'Stress': stress_final, 
+                        'Strain': strain_final, 
+                        'Color': color} #Diccionario   
 
-fig, axs = plt.subplots(2)
-axs[0].plot(final_data[19]['Strain Norm'], final_data[19]['Stress'], color = 'darkblue')
-axs[0].plot(final_data[20]['Strain Norm'], final_data[20]['Stress'], color = 'darkblue')
-axs[0].plot(final_data[21]['Strain Norm'], final_data[21]['Stress'], color = 'darkblue')
-axs[1].plot(final_data[32]['Strain Norm'], final_data[32]['Stress'], color = 'darkblue')
-axs[1].plot(final_data[35]['Strain Norm'], final_data[35]['Stress'], color = 'darkblue')
-axs[1].plot(final_data[36]['Strain Norm'], final_data[36]['Stress'], color = 'darkblue')
-plt.title('Strain- Stress Plot')
-plt.xlabel('Strain')
-plt.ylabel('Stress')
-#plt.show()
-    
+# Plots
+fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True)
+for experiment_number, experiment_data in final_data.items():
+    if experiment_data['Grain Size'] == 'Coarse':
+        #print(experiment_number, 'This is Stress', experiment_data['Stress']) 
+        axs[0].plot(experiment_data['Strain'], experiment_data['Stress'], color = experiment_data['Color'], label = experiment_number)
+        axs[0].set_title('Strain- Stress Plot - Coarse Grained Samples', fontsize = 16)
+        axs[0].legend( loc = 'upper right')
+    else:
+        axs[1].plot(experiment_data['Strain'], experiment_data['Stress'], color = experiment_data['Color'], label = experiment_number)
+        axs[1].set_title('Strain- Stress Plot - Fine Grained Samples', fontsize = 16)
+        axs[1].legend(loc = 'upper right')
+
+
+fig.text(0.5, 0.04, 'Strain', ha='center', fontsize = 16)
+fig.text(0.04, 0.5, 'Stress (MPa)', va='center', rotation='vertical',fontsize = 16)
+plt.show() 
 
 
 
