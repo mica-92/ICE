@@ -1,7 +1,7 @@
 # Update Log
     # August 6th = Cutting Data works for all sets except 33
     # August 9th = Change to strain vs. strain_norm (this was a mistake from my part). Show all data instead of only. Removed 32 as well.
-    # August 10th = Fixed color, dcitionary iteration and plotting - Trying to make the SS slope cut
+    # August 10th = Fixed color, dcitionary iteration and plotting - Trying to make the SS slope cut. 33 fixed. porblem with 32 done in multiple days
 
 # Import
 import csv
@@ -197,7 +197,6 @@ for i in experiment_number:
 
     #strain_loc = [n for n,i in enumerate(strain) if i > 0.1][0]
 
-
 # Saving Data in Dictionary
     final_data[i] = {'L0': L0, 'Strain Rate Exp': SR_exp, 'Grain Size': GS_exp, 
                         'Temperature':temp[cut_initial:cut_final], 
@@ -216,13 +215,13 @@ for i in experiment_number:
                         'Color': color} #Diccionario   
 
 # Plots
-#totalexp = len(exp_EMS['Experiment Number'])
-#for i in experiment_number:
- #   loc = experiment_number[experiment_number == i].index[0]
-  #  for experiment_number_lopp, experiment_data in final_data.items():
-   #     fig, expgraph = plt.subplots(nrows = totalexp, ncols = 2)
-#        expgraph[loc,0].plot(experiment_data['Strain'], experiment_data['Stress'], color = experiment_data['Color'])
- #       expgraph[loc,1].plot(experiment_data['Strain Raw'], experiment_data['Stress Raw'], color = experiment_data['Color'])
+totalexp = len(exp_EMS['Experiment Number'])
+count = 0
+fig, expgraph = plt.subplots(nrows = totalexp, ncols = 2)
+for experiment_number, experiment_data in final_data.items():
+    expgraph[count,0].plot(experiment_data['Strain'], experiment_data['Stress'], color = experiment_data['Color'])
+    expgraph[count,1].plot(experiment_data['Strain Raw'], experiment_data['Stress Raw'], color = experiment_data['Color'])
+    count += 1
 
 fig, axs = plt.subplots(nrows=2, ncols=1, sharex=True, sharey=True)
 for experiment_number, experiment_data in final_data.items():
@@ -241,30 +240,33 @@ fig.text(0.5, 0.04, 'Strain', ha='center', fontsize = 16)
 fig.text(0.04, 0.5, 'Stress (MPa)', va='center', rotation='vertical',fontsize = 16)
 
 fig, ax = plt.subplots(nrows = 1, ncols= 1)
+coarseStress = []
+coarseStrain = []
+fineStress = []
+fineStrain = []
 for experiment_number, experiment_data in final_data.items():
     if experiment_data['Grain Size'] == 'Coarse':
-        print(experiment_data['Stress Peak'])
-        print(experiment_data['Strain Rate Peak'])
         ax.plot(experiment_data['Stress Peak'], experiment_data['Strain Rate Peak'], color = 'blue', label = f'{experiment_number} Peak', marker='x', markersize=10)
         ax.plot(experiment_data['Stress Flow'], experiment_data['Strain Rate Flow'], color = 'darkblue', label = f'{experiment_number} Flow', marker='.', markersize=10)
+        coarseStress.append(experiment_data['Stress Peak'])
+        coarseStrain.append(experiment_data['Strain Rate Peak'])
+        print(type(experiment_data['Stress Peak']))
     else:
         ax.plot(experiment_data['Stress Peak'], experiment_data['Strain Rate Peak'], color = 'green', label = f'{experiment_number} Peak', marker='x', markersize=10)
         ax.plot(experiment_data['Stress Flow'], experiment_data['Strain Rate Flow'], color = 'darkgreen', label = f'{experiment_number} Flow', marker='.', markersize=10)
         ax.legend(loc = 'upper left')
+        fineStress.append(experiment_data['Stress Peak'])
+        fineStrain.append(experiment_data['Strain Rate Peak'])
+
+slopeC, interceptC, r_valueC, p_valueC, std_errC = linregress (coarseStress,coarseStrain)
+slopeS, interceptS, r_valueS, p_valueS, std_errS = linregress (fineStress,fineStrain)
+
+plt.plot(coarseStress, slopeC*coarseStress + interceptC, color = 'blue')
+plt.plot(fineStress, slopeS*fineStress + interceptS, color = 'green')
+
 plt.title('Peak and Flow Stress- Strain Rate Plot', fontsize = 16)
 plt.xlabel('Stress (MPa)', fontsize = 16)
 plt.ylabel('Strain Rate (s-1)', fontsize = 16)
-
-fig, axs = plt.subplots(2,2)
-fig.suptitle(f'PIL32')
-axs[0,1].plot(final_data[33]['Strain'], final_data[33]['Stress'], color = 'darkblue')
-axs[0,1].set_title('Processed Stress- Strain')
-axs[1,1].plot(final_data[33]['Seconds'], final_data[33]['Strain'], color = 'red')
-axs[1,1].set_title('Processed Strain- Time')
-axs[0,0].plot(final_data[33]['Strain Raw'], final_data[33]['Stress Raw'], color = 'darkblue')
-axs[0,0].set_title('Raw Stress- Strain')
-axs[1,0].plot(final_data[33]['Seconds Raw'], final_data[33]['Strain Raw'], color = 'red')
-axs[1,0].set_title('Raw Strain- Time')
 
 
 plt.show() 
