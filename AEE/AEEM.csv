@@ -1,2 +1,3 @@
-Experiment Number,Date,Target Temperature (K),Grain Size,Target Strain Rate,Initial Length,Final Length,Target Pressure (MPa),Internal Axial Load,Storage,Sample Touch
-313,08/11/2021,269,Standard,1.00E-04,1.98,1.55,20,-0.0325,Orange/6,0
+Experiment Number,Date,Target Temperature (K),Grain Size,Target Strain Rate,Initial Length,Final Length,Target Pressure (MPa),Internal Axial Load,Storage,Sample Touch,Retreat
+313,08/11/2021,269,Standard,1.00E-04,1.98,1.55,20,-0.0325,Orange/6,510000,-210000
+314,08/12/2021,263,Standard,1.00E-04,1.86,1.52,20,-0.0325,Orange/6,8900000,10442611
