@@ -1,0 +1,16 @@
+Experiment Number,Date,Target Temperature (K),Grain Size,Target Strain Rate,Initial Length,Final Length,Target Pressure (MPa),Internal Axial Load,Storage,Sample Touch,Retreat,Regime,Operator
+2,04/15/2015,264,Standard,3.5e-05,2.25,1.82,10,NaN,NaN,49000,54000,DC,CQ&DG,NaN
+4,04/21/2015,264,Standard,3.81e-05,2.1,1.65,10,NaN,NaN,56540,57100,DC,CQ&DG,NaN
+5,04/30/2015,264,Standard,9.16e-05,2.62,2.21,10,NaN,NaN,53200,55000,DC,CQ&DG,NaN
+14,04/15/2015,264,Standard,1.39e-04,1.73,NaN,NaN,NaN,NaN,39250,40800,DC,CQ&DG,NaN
+19,08/12/2015,264,Coarse,3.6e-05,2.22,NaN,NaN,NaN,NaN,47000,52000,DC,CQ,NaN
+20,08/18/2015,264,Coarse,8.08e-05,1.98,NaN,NaN,NaN,NaN,47000,49500,DC,CQ,NaN
+21,08/19/2015,264,Coarse,9.14e-06,1.75,NaN,NaN,NaN,NaN,40000,61700,DC,CQ,NaN
+23,08/27/2015,264,Coarse,3.125e-04,1.92,NaN,NaN,NaN,NaN,46560,47100,DC,CQ,NaN
+26,09/29/2015,264,Coarse,2.96e-05,2.7,NaN,NaN,NaN,NaN,52560,57900,DC,CQ,NaN
+27,09/30/2015,264,Standard,3.91e-05,2.25,NaN,NaN,NaN,NaN,52400,56700,DC,CQ,NaN
+28,10/01/2015,264,Standard,3.03e10-07,2.64,NaN,NaN,NaN,NaN,NaN,NaN,GBS,CQ,NaN
+30,11/19/2015,264,Standard,1.2e-06,2.00,NaN,NaN,NaN,NaN,0.168,0.3,GBS,CQ, Overnight Experiment SR cut data Standard ice with al2o3 particles
+31,12/03/2015,265,Standard,3e-04,2.13,NaN,NaN,NaN,NaN,52400,53100,GBS,CQ, Fast rte for the constant rate experiments
+32,12/07/2015,266,Standard,1.97e-06,2.44,NaN,NaN,NaN,NaN,0.120,0.36,GBS,CQ,Very slow rate for the constant rate experiments
+33,12/10/2015,262,Standard,2.02e10-04,1.98,NaN,NaN,NaN,NaN,45200,46200,DC,CQ,Very fast rate for the constant rate experiments

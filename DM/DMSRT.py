@@ -12,20 +12,20 @@ import time
 # Parameters Goldsby, Kohlstedt, Pappalardo (2001) - A COMPOSITE FLOW LAW FOR WATER ICE (...)
 
 # Dislocation Creep Parameters
-A_DC257 = 1.2e+06 # A <258 (MPa^-4 s^-1) updated form Kuiper 2019 4e+05 original value
-A_DC259 = 6e+28 # A >258 (MPa^-4 s^-1)
+A_DC257 = 5e+5 #1.2e+06 # A <258 (MPa^-4 s^-1) updated form Kuiper 2019 4e+05 original value
+A_DC259 = 6e+23#6e+28 # A >258 (MPa^-4 s^-1)
 n_DC = 4 # stress exponent
 p_DC = 0 # grain size exponent
-Q_DC257 = 60 # activation energy <258 (KJ/mol)
-Q_DC259 = 181 # activation energy >258 (KJ/mol)
+Q_DC257 = 64 #60 # activation energy <258 (KJ/mol)
+Q_DC259 = 155 #181 # activation energy >258 (KJ/mol)
 
 # GBS Parameters
-A_GBS254 = 3.9e-03 # A <258 (MPa^-1.8 m^1.4 s^-1)
-A_GBS256 = 3e+26 # A >258 (MPa^-1.8 m^1.4 s^-1)
+A_GBS254 = 1.1e+2 #3.9e-03 # A <258 (MPa^-1.8 m^1.4 s^-1)
+A_GBS256 = 8.5e+37 #3e+26 # A >258 (MPa^-1.8 m^1.4 s^-1)
 n_GBS = 1.8 # stress exponent
 p_GBS = 1.4 # grain size exponent
-Q_GBS254 = 49 # activation energy <255 (KJ/mol)
-Q_GBS256 = 192 # activation energy >255 (KJ/mol)
+Q_GBS254 = 70 #49 # activation energy <255 (KJ/mol)
+Q_GBS256 = 250 #192 # activation energy >255 (KJ/mol)
 
 # Basal Slip Parameters
 A_BS = 5.5e+07 # A
@@ -42,8 +42,8 @@ d = 1e-03 # grain size (m)
 ##### see if can make it 
 
 # temperature
-temp_warm = pd.Series(np.arange(258,274,1)) #temperature series from 273 to 150
-temp_cold = pd.Series(np.arange(100,258,1))
+temp_warm = pd.Series(np.arange(262,274,1)) #temperature series from 273 to 150
+temp_cold = pd.Series(np.arange(100,262,1))
 # temp_data = pd.Series(np.arange(150,274,1)) 
 # there has to be a way to create an if ... then use this and this equation if not...
 #print(temp_data)
@@ -80,12 +80,6 @@ for row in temp_cold:
 rate_name = ['rate']
 exp_rate = pd.read_csv ('D:/ICE/DM/rates.csv', names = rate_name)
 rates = exp_rate['rate']
-
-
-# ---------------------
-## complete = {}
-##### for i in d:
-
 
 SRdata_final={} # strain rate curves = SR DC + SR GBS  shouldn'e we add a strain rate for BS?
 for i in rates:
@@ -131,7 +125,7 @@ ax.text(110, 0.02, 'Basal\nSlip', fontweight='bold', color = '#271902', path_eff
 
 ax.set_xlabel('Temperature (K)', labelpad=10)
 ax.set_ylim(10e-3, 10e+1)
-ax.set_xlim(100, 273)
+ax.set_xlim(240, 273)
 plt.yscale("log")
 ax.set_ylabel('Stress (MPa)', labelpad=10)
 

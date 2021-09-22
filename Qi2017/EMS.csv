@@ -1,0 +1,4 @@
+Experiment Number,Date,Target Temperature (K),Grain Size,Target Strain Rate,Initial Length,Final Length,Target Pressure (MPa),Internal Axial Load,Storage,Sample Touch,Retreat,Regime,Operator
+19,08/12/2015,264,Coarse,3.6e-05,2.22,NaN,NaN,NaN,NaN,47000,52000,DC,CQ
+20,08/18/2015,264,Coarse,8.08e-05,1.98,NaN,NaN,NaN,NaN,47000,49500,DC,CQ
+21,08/19/2015,264,Coarse,9.14e-06,1.75,NaN,NaN,NaN,NaN,40000,61700,DC,CQ
