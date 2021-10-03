@@ -16,7 +16,7 @@ def read_file(file):
             lst.append(record)
     return lst
 
-record=read_file(r'D:\ICE\542\Intive.csv')
+record=read_file(r'D:\ICE\542\Treples.csv')
 
 #%% Page visited for each user
 

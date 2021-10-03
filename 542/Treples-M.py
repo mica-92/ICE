@@ -34,3 +34,5 @@ for un in range (1,u):
         print(f'This is the triple list for user{u}:', triple_user)
     triples_final.append(triple_user)
 print('This is the complete triples list', triples_final)
+
+
